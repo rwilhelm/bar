@@ -1,23 +1,25 @@
 #!/usr/bin/env python3.7
+"""Lemonbar wrapper
+"""
 
 import asyncio
-from asyncio.subprocess import PIPE
-from datetime import datetime
-import logging
 import signal
 import sys
-from typing import List, Dict, Coroutine, Union
 
-import format
 from helpers import run, watch
-from modules.bspwm import report
+
 from modules.clock import clock
 
-def signal_handler(signum, frame):
-    sys.exit(0)
+
+def signal_handler(signum, frame):  # pylint: disable=unused-argument
+    """Handle Ctrl-C.
+    """
+    sys.exit(signum)
 
 
 async def main():
+    """Asynchrounosly run subprocesses and functions.
+    """
     await asyncio.gather(
         watch(clock()),
         run("bspc subscribe report"),
@@ -25,4 +27,4 @@ async def main():
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
-    asyncio.run(main())
+    asyncio.run(main())  # pylint: disable=no-member
