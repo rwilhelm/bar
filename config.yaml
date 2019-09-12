@@ -1,0 +1,65 @@
+---
+
+settings:
+  clockfmt: "%Y-%m-%d-%H:%M:%S"
+  clocksleep: 1
+
+blocks:
+
+  xtitle:
+    cmd: xtitle -s
+
+  bspwm:
+    cmd: bspc subscribe report
+    fmt: bspwm.fmt
+
+  clock:
+    func: clock
+    actions:
+      1: xclock
+    colors:
+      fg: bwhite
+      bg: blue
+
+    
+
+fonts:
+  font1: "Envy Code R:pixelsize=20:style=Regular:antialias=true:autohint=true"
+  font2: "Wuncon Siji:pixelsize=20:style=Regular:antialias=true:autohint=true"
+colors:
+  base16:
+    base00: "#16130f"  # -----
+    base01: "#2c2620"  # ----
+    base02: "#433b32"  # ---
+    base03: "#5a5047"  # --
+    base04: "#8a8075"  # -
+    base05: "#a39a90"  # +
+    base06: "#beb6ae"  # ++
+    base07: "#dbd6d1"  # +++
+    base08: "#826d57"  # ++++
+    base09: "#828257"  # +++++
+    base0A: "#6d8257"
+    base0B: "#57826d"
+    base0C: "#576d82"
+    base0D: "#6d5782"
+    base0E: "#82576d"
+    base0F: "#825757"
+  terminal:
+    black: "#16130f"     # base00, gray50
+    red: "#cc475e"       # 350|65|80 red
+    green: "#5ecc47"     # 110|65|80 green
+    yellow: "#ccb647"    #  50|65|80 yellow
+    blue: "#475ecc"      # 230|65|80 blue
+    magenta: "#7447cc"   # 290|65|80 magenta
+    cyan: "#47a0cc"      # 170|65|80 cyan
+    white: "#beb6ae"     # base06, gray90
+    grey: "#8C8A81"      # base01 black, bright
+    bred: "#ff5975"      # 350|65|80 red
+    bgreen: "#75ff59"    # 110|65|80 green
+    byellow: "#ffe359"   #  50|65|80 yellow
+    bblue: "#5975ff"     # 230|65|80 blue
+    bmagenta: "#e359ff"  # 290|65|80 magenta
+    bcyan: "#59c8ff"     # 170|65|80 cyan, light blue
+    bwhite: "#f1f0ee"    # base07 white
+
+...
