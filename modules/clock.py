@@ -1,14 +1,8 @@
-import asyncio
-from time import sleep
 from datetime import datetime
+from asyncio import sleep
 
-def clock():
-    print(datetime.today().strftime("D%Y-%m-%d-%H:%M:%S"))
+async def clock():
+    while True:
+        await sleep(1)
+        yield datetime.today().strftime("D%Y-%m-%d-%H:%M").encode()
 
-async def main():
-    while true:
-        clock()
-        sleep(1)
-
-if __name__ == "__main__":
-    asyncio.run(main())
