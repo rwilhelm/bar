@@ -1,8 +1,12 @@
 ---
 
-settings:
-  clockfmt: "%Y-%m-%d-%H:%M:%S"
-  clocksleep: 1
+bar:
+  height: 35
+  hover: True
+  name: bar
+  offset: -4
+  regions: 30
+
 
 
 blocks:
@@ -16,6 +20,8 @@ blocks:
 
   xtitle:
     cmd: xtitle -s
+    colors:
+      fg: cyan
 
   right:
     static: "%{r}"
@@ -23,17 +29,19 @@ blocks:
   clock:
     func: clock
     actions:
-      1: xclock
+      1: xclock&
     colors:
       fg: bwhite
-      bg: blue
-
-    
+    settings:
+      clockfmt: "%Y-%m-%d-%H:%M:%S"
 
 fonts:
-  font1: "Envy Code R:pixelsize=20:style=Regular:antialias=true:autohint=true"
-  font2: "Wuncon Siji:pixelsize=20:style=Regular:antialias=true:autohint=true"
+
+  font1: "Envy Code R:pixelsize=22:style=Regular:antialias=true:autohint=true"
+  font2: "Wuncon Siji:pixelsize=22:style=Regular:antialias=true:autohint=true"
+
 colors:
+
   base16:
     base00: "#16130f"  # -----
     base01: "#2c2620"  # ----
@@ -51,6 +59,7 @@ colors:
     base0D: "#6d5782"
     base0E: "#82576d"
     base0F: "#825757"
+
   terminal:
     black: "#16130f"     # base00, gray50
     red: "#cc475e"       # 350|65|80 red

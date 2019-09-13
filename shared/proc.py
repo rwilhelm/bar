@@ -12,23 +12,18 @@ FOUT = {}
 
 
 def output(name, line, fmt=None):
-    """
-    """
-
+    """Cleanup, format, store and output."""
     line = strfmt(line)
 
     if fmt:
         line = fmt(line)
 
     FOUT[name] = line
-
     print("".join(FOUT.values()), flush=True)
 
 
 async def watch(name, stream, fmt=None):
-    """Deduplicate and forward given readable/stream,
-    e.g. from subprocesses or generator functions."""
-
+    """Read and deduplicate."""
     last = None
     async for line in stream:
         if last == line:
@@ -42,9 +37,6 @@ async def watch(name, stream, fmt=None):
 
 
 async def run(name, block):
-    """
-    """
-
     if 'static' in block.keys():
         FOUT[name] = block['static']
         return
@@ -63,7 +55,7 @@ async def run(name, block):
     elif 'func' in block.keys():
         func = block['func']
         func = getattr(__import__("modules." + func, fromlist=[func]), func)
-        await watch(name, func(), fmt)
+        await watch(name, func(block), fmt)
 
 
 def init(blocks):
@@ -71,4 +63,4 @@ def init(blocks):
         if 'static' in block:
             FOUT[block] = block['static']
         else:
-            FOUT[block] = block
+            FOUT[block] = block  # LOADING...

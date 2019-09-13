@@ -4,10 +4,8 @@ import asyncio
 import signal
 import sys
 
+from shared.config import config
 from shared.proc import init, run
-
-
-import yaml
 
 
 def signal_handler(signum, frame):  # pylint: disable=unused-argument
@@ -15,15 +13,16 @@ def signal_handler(signum, frame):  # pylint: disable=unused-argument
 
 
 async def main():
-    config = yaml.safe_load(open("config.yaml"))
+
+    cfg = config()
 
     # creates keys in output dictionary to have them properly ordered (creation
     # order seems to be maintained in dicts)
-    init(config['blocks'])
+    init(cfg['blocks'])
 
     # pass all configured blocks async to the run method
-    await asyncio.gather(*map(lambda x: run(x, config['blocks'][x]),
-                              config['blocks']))
+    await asyncio.gather(*map(lambda x: run(x, cfg['blocks'][x]),
+                              cfg['blocks']))
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@ import sys
 from typing import NamedTuple
 
 from shared.fmt import strfmt
+from shared.config import config
 
 
 class Action(NamedTuple):
@@ -11,31 +12,39 @@ class Action(NamedTuple):
     command: str = ""
 
 
-def block(text, fg="", bg="", actions=None):
+def fmt(string, block):
     """Format click actions for lemonbar
     """
 
-    text = strfmt(text)
+    string = strfmt(string)
 
     pfx = []
     sfx = []
 
-    if actions:
-        for action in actions[::-1]:
+    if 'actions' in block:
+        actions = block['actions']
+
+        for action in actions:
+            if not isinstance(action, Action):
+                action = Action(action, actions[action])
             if action.button < 1 or action.button > 7:
                 sys.stderr.write(
                     "Invalid button assignment for action: {0}"
-                    .format(action.command))
+                    .format(actions[action]))
 
             pfx.append("%{{A{0}:{1}:}}".format(action.button, action.command))
             sfx.append("%{A}")
 
-    if fg:
-        pfx.append("%{{F{0}}}".format(fg))
-        sfx.append("%{F-}")
+    if 'colors' in block:
+        c = config()['colors']['terminal']
+        if 'fg' in block['colors']:
+            color = c[block['colors']['fg']]
+            pfx.append("%{{F{0}}}".format(color))
+            sfx.append("%{F-}")
 
-    if bg:
-        pfx.append("%{{B{0}}}".format(bg))
-        sfx.append("%{B-}")
+        if 'bg' in block['colors']:
+            color = c[block['colors']['bg']]
+            pfx.append("%{{B{0}}}".format(color))
+            sfx.append("%{B-}")
 
-    return "".join(pfx + [" ", text, " "] + sfx)
+    return "".join(pfx + [" ", string, " "] + sfx)

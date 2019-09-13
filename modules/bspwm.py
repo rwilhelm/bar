@@ -2,7 +2,8 @@
 
 from re import match
 
-from shared.blocks import Action, block
+from shared.blocks import Action, fmt
+from shared.config import config
 
 
 # with Popen(["bspc", "subscribe", "report"], stdout=PIPE, bufsize=1,
@@ -10,11 +11,9 @@ from shared.blocks import Action, block
 
 
 def bspwm_fmt(line):
-    # TODO
-    red = "#cc475e"
-    blue = "#475ecc"
-
     out = []
+
+    c = config()['colors']['terminal']
 
     if not line[0] == "W":
         return
@@ -44,33 +43,33 @@ def bspwm_fmt(line):
 
         # if t == "m":
         #    # unfocused monitor
-        #    out.append(block(v))
+        #    out.append(fmt(v))
         # elif t == "M":
         #    # focused monitor
-        #    out.append(block(v))
+        #    out.append(fmt(v))
 
         if t == "f":
             # free unfocused desktop
-            out.append(block(v, actions=actions))
+            out.append(fmt(v, {'actions':actions}))
         elif t == "F":
             # free focused desktop
-            out.append(block(v, actions=actions, fg=red))
+            out.append(fmt(v, {'actions': actions, 'colors': {'fg': 'red'}}))
         elif t == "o":
             # occupied unfocused desktop
-            out.append(block(v, actions=actions, fg=blue))
+            out.append(fmt(v, {'actions': actions, 'colors': {'fg': 'blue'}}))
         elif t == "O":
             # occupied focused desktop
-            out.append(block(v, actions=actions, fg=red))
+            out.append(fmt(v, {'actions': actions, 'colors': {'fg': 'red'}}))
         elif t == "u":
             # urgent unfocused desktop
-            out.append(block(v, actions=actions, fg=red))
+            out.append(fmt(v, {'actions': actions, 'colors': {'fg': 'red'}}))
         elif t == "U":
             # urgent focused desktop
-            out.append(block(v, actions=actions, fg=red))
+            out.append(fmt(v, {'actions': actions, 'colors': {'fg': 'red'}}))
 
         # if t == "L":
         #    # focused desktop layout
-        #    out.append(block(v, actions=[
+        #    out.append(fmt(v, actions=[
         #        Action(1, "bspc desktop -l next")
         #    ]))
 

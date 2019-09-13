@@ -3,14 +3,12 @@
 from asyncio import sleep
 from datetime import datetime
 
-from shared.blocks import block
+from shared.blocks import fmt
 
 
-def fmt(line):
-    print(line)
-
-
-async def clock():
+async def clock(block):
+    clockfmt = block['settings']['clockfmt']
     while True:
         await sleep(1)
-        yield block(datetime.today().strftime("%Y-%m-%d-%H:%M:%S").encode())
+        string = datetime.today().strftime(clockfmt).encode()
+        yield fmt(string, block)
