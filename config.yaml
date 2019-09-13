@@ -1,18 +1,32 @@
 ---
-
 bar:
   height: 35
   hover: True
   name: bar
   offset: -4
   regions: 30
-
+  colors:
+    fg: base16.base07
+    bg: base16.base00
+  fonts:
+    font1: "Envy Code R:pixelsize=22:style=Regular:antialias=true:autohint=true"
+    font2: "Wuncon Siji:pixelsize=22:style=Regular:antialias=true:autohint=true"
 
 
 blocks:
-
   left:
     static: "%{l}"
+
+  left_corner:
+    static: " "
+    actions:
+      1: bspc desktop -f last.occupied
+      3: bspc desktop -f next.:occupied
+      4: bspc desktop -f next.occupied
+      5: bspc desktop -f prev.occupied
+    colors:
+      fg: yellow
+      bg: blue
 
   bspwm:
     cmd: bspc subscribe report
@@ -26,6 +40,30 @@ blocks:
   right:
     static: "%{r}"
 
+  bitcoin:
+    static: bitcoin
+
+  weather:
+    static: weather
+
+  mpd:
+    static: mpd
+
+  volume:
+    static: volume
+
+  cpu:
+    static: cpu
+
+  load:
+    static: load
+
+  mem:
+    static: mem
+
+  traffic:
+    static: traffic
+
   clock:
     func: clock
     actions:
@@ -35,10 +73,15 @@ blocks:
     settings:
       clockfmt: "%Y-%m-%d-%H:%M:%S"
 
-fonts:
-
-  font1: "Envy Code R:pixelsize=22:style=Regular:antialias=true:autohint=true"
-  font2: "Wuncon Siji:pixelsize=22:style=Regular:antialias=true:autohint=true"
+  right_corner:
+    static: " "
+    actions:
+      1: nautilus.sh new&
+      2: st ranger&
+      3: nautilus.sh toggle&
+    colors:
+      fg: yellow
+      bg: blue
 
 colors:
 

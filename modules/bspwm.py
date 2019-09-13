@@ -3,17 +3,10 @@
 from re import match
 
 from shared.blocks import Action, fmt
-from shared.config import config
-
-
-# with Popen(["bspc", "subscribe", "report"], stdout=PIPE, bufsize=1,
-#             universal_newlines=True) as p:
 
 
 def bspwm_fmt(line):
     out = []
-
-    c = config()['colors']['terminal']
 
     if not line[0] == "W":
         return
@@ -50,7 +43,7 @@ def bspwm_fmt(line):
 
         if t == "f":
             # free unfocused desktop
-            out.append(fmt(v, {'actions':actions}))
+            out.append(fmt(v, {'actions': actions}))
         elif t == "F":
             # free focused desktop
             out.append(fmt(v, {'actions': actions, 'colors': {'fg': 'red'}}))
@@ -67,19 +60,41 @@ def bspwm_fmt(line):
             # urgent focused desktop
             out.append(fmt(v, {'actions': actions, 'colors': {'fg': 'red'}}))
 
-        # if t == "L":
+        #if match("[LTG]", t):
+        #    pad = ""
+        #
+        #if t == "L":
         #    # focused desktop layout
-        #    out.append(fmt(v, actions=[
-        #        Action(1, "bspc desktop -l next")
-        #    ]))
+        #    out.append(fmt(v, {
+        #        'pad': pad,
+        #        'actions': [
+        #            Action(1, "bspc desktop -l next")
+        #        ],
+        #        'colors': {
+        #            'bg': 'grey',
+        #            'fg': 'black'
+        #        }
+        #    }))
 
-        # if t == "T":
+        #if t == "T":
         #    # focused node state
-        #    out.append(block(v))
+        #    out.append(fmt(v, {
+        #        'pad': pad,
+        #        'colors': {
+        #            'bg': 'grey',
+        #            'fg': 'black'
+        #        }
+        #    }))
 
-        # if t == "G":
+        #if t == "G":
         #    # focused node flags
-        #    out.append(block(v))
+        #    out.append(fmt(v, {
+        #        'pad': pad,
+        #        'colors': {
+        #            'bg': 'red',
+        #            'fg': 'black'
+        #        }
+        #    }))
 
         # - - - - - - - - - -
 

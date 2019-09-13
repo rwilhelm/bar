@@ -5,6 +5,7 @@ import asyncio
 from asyncio import create_subprocess_shell as shell
 from asyncio.subprocess import PIPE
 
+from shared.blocks import fmt as blockfmt
 from shared.fmt import strfmt
 from shared.log import log
 
@@ -19,7 +20,7 @@ def output(name, line, fmt=None):
         line = fmt(line)
 
     FOUT[name] = line
-    print("".join(FOUT.values()), flush=True)
+    print("".join(FOUT.values()).strip(), flush=True)
 
 
 async def watch(name, stream, fmt=None):
@@ -38,7 +39,8 @@ async def watch(name, stream, fmt=None):
 
 async def run(name, block):
     if 'static' in block.keys():
-        FOUT[name] = block['static']
+        print()
+        FOUT[name] = blockfmt(block['static'], block)
         return
 
     if 'fmt' in block.keys():
