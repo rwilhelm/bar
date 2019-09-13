@@ -5,10 +5,9 @@ from datetime import datetime
 
 from shared.blocks import fmt
 
-
 async def clock(block):
     clockfmt = block['settings']['clockfmt']
     while True:
         await sleep(1)
-        string = datetime.today().strftime(clockfmt).encode()
-        yield fmt(string, block)
+        line = datetime.today().strftime(clockfmt)
+        yield fmt(line.strip(), block)

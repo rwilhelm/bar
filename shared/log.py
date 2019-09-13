@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.DEBUG,
                     filemode="w")
 
 
-async def log(stream):
+async def log_stream(stream):
     logger = logging.getLogger('bar')
     async for line in stream:
         logger.error(line)
