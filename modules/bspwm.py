@@ -1,16 +1,15 @@
 #!/usr/bin/env python3.7
 
-import asyncio
 from re import match
 
-from helpers import Action, block, run
+from shared.blocks import Action, block
 
 
 # with Popen(["bspc", "subscribe", "report"], stdout=PIPE, bufsize=1,
 #             universal_newlines=True) as p:
 
 
-def fmt(line):
+def bspwm_fmt(line):
     # TODO
     red = "#cc475e"
     blue = "#475ecc"
@@ -43,14 +42,14 @@ def fmt(line):
 
         # - - - - - - - - - -
 
-        if t == "m":
-            # unfocused monitor
-            out.append(block(v))
-        elif t == "M":
-            # focused monitor
-            out.append(block(v))
+        # if t == "m":
+        #    # unfocused monitor
+        #    out.append(block(v))
+        # elif t == "M":
+        #    # focused monitor
+        #    out.append(block(v))
 
-        elif t == "f":
+        if t == "f":
             # free unfocused desktop
             out.append(block(v, actions=actions))
         elif t == "F":
@@ -69,27 +68,20 @@ def fmt(line):
             # urgent focused desktop
             out.append(block(v, actions=actions, fg=red))
 
-        elif t == "L":
-            # focused desktop layout
-            out.append(block(v, actions=[
-                Action(1, "bspc desktop -l next")
-            ]))
+        # if t == "L":
+        #    # focused desktop layout
+        #    out.append(block(v, actions=[
+        #        Action(1, "bspc desktop -l next")
+        #    ]))
 
-        elif t == "T":
-            # focused node state
-            out.append(block(v))
+        # if t == "T":
+        #    # focused node state
+        #    out.append(block(v))
 
-        elif t == "G":
-            # focused node flags
-            out.append(block(v))
+        # if t == "G":
+        #    # focused node flags
+        #    out.append(block(v))
 
         # - - - - - - - - - -
 
     return "".join(out)
-
-
-async def desktops():
-    yield await run(name="bspwm", cmd="bspc subscribe report", fmt=fmt)
-
-if __name__ == "__main__":
-    asyncio.run(desktops())

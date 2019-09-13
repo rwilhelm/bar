@@ -4,14 +4,21 @@ settings:
   clockfmt: "%Y-%m-%d-%H:%M:%S"
   clocksleep: 1
 
+
 blocks:
+
+  left:
+    static: "%{l}"
+
+  bspwm:
+    cmd: bspc subscribe report
+    fmt: bspwm
 
   xtitle:
     cmd: xtitle -s
 
-  bspwm:
-    cmd: bspc subscribe report
-    fmt: bspwm.fmt
+  right:
+    static: "%{r}"
 
   clock:
     func: clock
