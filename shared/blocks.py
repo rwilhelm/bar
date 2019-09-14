@@ -3,13 +3,12 @@
 import sys
 from typing import NamedTuple
 
-from shared.config import config
+import shared.config as config
 
 
 class Action(NamedTuple):
     button: int = 1
     command: str = ""
-
 
 
 def clean(string):
@@ -19,21 +18,6 @@ def clean(string):
         return string.strip()
     except UnicodeDecodeError:
         return string.strip()
-
-#def clean(string):
-#    return string
-
-    #if isinstance(string, str):
-    #    print("CLEAN GOT STRING", string)
-    #    if string == " ":
-    #        return string
-    #else:
-    #    print("CLEAN GOT STRING", type(string))
-    #    return decode(string)
-
-
-#def pad(string, lpad="", rpad=""):
-#    pass
 
 
 def fmt(line, block=None):
@@ -61,7 +45,7 @@ def fmt(line, block=None):
                 sfx.append("%{A}")
 
         if 'colors' in block:
-            c = config()['colors']['terminal']
+            c = config.config['colors']['terminal']
             if 'fg' in block['colors']:
                 color = c[block['colors']['fg']]
                 pfx.append("%{{F{0}}}".format(color))
@@ -78,7 +62,5 @@ def fmt(line, block=None):
             pad = block['pad']
 
     arr = pfx + [pad, line, pad] + sfx
-    #print("err ", type(arr[2]))
     line = "".join(list(filter(None, arr)))
-    #print("fmt \"{}\"".format(line))
     return line

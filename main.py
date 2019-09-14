@@ -4,18 +4,25 @@ import asyncio
 import signal
 import sys
 
-from shared.config import config
+import shared.config as config
 from shared.proc import init, run
+from shared.lemonbar import lemonbar
 
 
-def signal_handler(signum, frame):  # pylint: disable=unused-argument
+# pylint: disable=unused-argument
+def signal_handler(signum, frame):
     sys.exit(signum)
 
 
 async def main():
 
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete(tcp_echo_client(message, loop))
+    # loop.close()
+
     # blocks are configured in config.yaml
-    blocks = config()['blocks']
+    print(config)
+    blocks = config.config['blocks']
 
     if not blocks:
         print("No blocks configured")
@@ -31,4 +38,4 @@ async def main():
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
-    asyncio.run(main())  # pylint: disable=no-member
+    asyncio.run(main())

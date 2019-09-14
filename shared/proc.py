@@ -35,7 +35,8 @@ def output(name, block, line=None):
         FOUT[name] = line
 
     # Output
-    print("".join(FOUT.values()), flush=True)
+    out = "".join(FOUT.values())
+    print(out, flush=True)
 
 
 async def watch(name, block, stream):
@@ -87,7 +88,7 @@ async def run(name, block):
     elif 'func' in block.keys():
         func = block['func']
         func = getattr(__import__("modules." + func, fromlist=[func]), func)
-        await watch(name, block, func(block))
+        await watch(name, block, func())
 
 
 def init(blocks):

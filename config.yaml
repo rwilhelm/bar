@@ -53,8 +53,18 @@ blocks:
 
     mpd:
         func: mpd
+        actions:
+            1: mpc toggle --quiet
+            2: mpc next --quiet
+            3: st ncmpcpp&
+            4: mpc single --quiet
+            5: togglelove
         colors:
             fg: yellow
+        settings:
+            host: localhost
+            port: 6600
+            password: blub
 
     volume:
         static: volume
@@ -78,7 +88,7 @@ blocks:
         colors:
             fg: bwhite
         settings:
-            clockfmt: "%Y-%m-%d-%H:%M"
+            clockfmt: "%Y-%m-%d-%H:%M:%S"
 
     right_corner:
         static: " "
