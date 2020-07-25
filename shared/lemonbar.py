@@ -1,29 +1,62 @@
 #!/usr/bin/env python3.7
 
-import asyncio
-from asyncio import create_subprocess_shell as shell
-from asyncio.subprocess import PIPE
-
-from shared.log import log_stream
+from shared.config import config
+from shared.proc import Proc
 
 
-async def lemonbar():
+class Lemonbar(Proc):
+    def __init__(self, bar: str = "lemonbar"):
+        super(Lemonbar, self).__init__()
+        cfg = config[bar]
+        self.args = [
+            "-g",
+            "{}x{}+{}+{}".format(
+                cfg.get("width", ""),
+                cfg.get("height", ""),
+                cfg.get("x", ""),
+                cfg.get("y", ""),
+            ),
+        ]
 
-    args = ["lemonbar",
-            "-g", "x35++",
-            "-f", """Envy Code R:pixelsize = 22:style = Regular:antialias =
-            true:autohint = true""",
-            "-f", """Wuncon Siji:pixelsize = 22:style = Regular:antialias =
-            true:autohint = true""",
-            "-B", "#16130f",
-            "-F", "#dbd6d1",
-            "-n", "bar",
-            "-H",
-            "-a", "30",
-            "-o", "-4"]
+        if "colors" in cfg:
+            if "fg" in cfg["colors"]:
+                theme, color = cfg["colors"]["fg"].split(".")
+                self.args += ["-F", config["colors"][theme][color]]
+            if "bg" in cfg["colors"]:
+                theme, color = cfg["colors"]["bg"].split(".")
+                self.args += ["-B", config["colors"][theme][color]]
 
-    proc = await shell(" ".join(args), stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    await asyncio.gather(log_stream(proc.stdout), log_stream(proc.stderr))
+        if "fonts" in cfg:
+            if "font1" in cfg["fonts"]:
+                self.args += ["-f", cfg["fonts"]["font1"]]
+
+            if "font2" in cfg["fonts"]:
+                self.args += ["-f", cfg["fonts"]["font2"]]
+
+        if "regions" in cfg:
+            self.args += ["-a", cfg["regions"]]
+
+        if "offset" in cfg:
+            self.args += ["-o", cfg["offset"]]
+
+        if "name" in cfg:
+            self.args += ["-n", cfg["name"]]
+
+        if "hover" in cfg:
+            self.args.append("-H")
+
+        if "bottom" in cfg:
+            self.args.append("-b")
+
+        if "permanent" in cfg:
+            self.args.append("-p")
+
+        if "docking" in cfg:
+            self.args.append("-d")
+
 
 if __name__ == "__main__":
-    asyncio.run(lemonbar())
+    print("A", __name__)
+else:
+    print("B", __name__)
+    lemonbar = Lemonbar()

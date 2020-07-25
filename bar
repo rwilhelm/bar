@@ -1,0 +1,5 @@
+#!/bin/zsh
+
+/home/asdf/local/dev/work/cur/bar/bar/main.py
+sleep 0.5
+xdo above -t $(xdo id -n root) $(xdo id -n lemonbar)

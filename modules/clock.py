@@ -1,20 +1,18 @@
 #!/usr/bin/env python3.7
 
-from asyncio import run, sleep
+from asyncio import sleep
 from datetime import datetime
 
-from shared.helpers import get_config as c, print_block, yield_block
+from shared.config import get_settings
 
 
 async def clock():
-    clockfmt = c()['settings']['clockfmt']
+    clockfmt = get_settings('clock', 'format')
     while True:
-        yield datetime.today().strftime(clockfmt).strip()
+        yield datetime.today().strftime(clockfmt)
         await sleep(1)
 
-
-async def main():
-    await yield_block(clock)
-
 if __name__ == "__main__":
-    run(print_block(clock))
+    print("A", __name__)
+else:
+    print("B", __name__)

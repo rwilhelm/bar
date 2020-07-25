@@ -1,66 +1,63 @@
-#!/usr/bin/env python
+from shared.args import getopt
+from shared.config import config
 
-import sys
-from typing import NamedTuple
-
-import shared.config as config
+BLOCKS = {}
 
 
-class Action(NamedTuple):
-    button: int = 1
-    command: str = ""
+def stage(name: str, line: str) -> str:
+    def build() -> str:
+        last = None
+        stage_out = []
+        for name, block in BLOCKS.items():
+            cur = config["blocks"][name]
+            if (
+                name == "left"
+                or name == "leftc"
+                or name == "right"
+                or last
+                and "static" in last.keys()
+            ):
+                stage_out.append(block)
+            else:
+                stage_out.append(" ")
+                stage_out.append(block)
+
+            last = cur
+
+        stage_out = "".join(stage_out)
+        return stage_out
+
+    if not BLOCKS[name] == line:
+        BLOCKS[name] = line
+
+    return build()
 
 
-def clean(string):
-    try:
-        return string.decode().strip()
-    except AttributeError:
-        return string.strip()
-    except UnicodeDecodeError:
-        return string.strip()
+def init():
+    """Initialize the global BLOCKS dict by creating the dict and the
+     keys according to the blocks configured. The values of static
+     blocks are immediately stored. For non-static blocks the block
+     name will be stored, which acts as a placeholder until the
+     value of the block is updated. By creating the keys the order
+     of the blocks is preserved in the order they are configured."""
 
+    blocks = {}
 
-def fmt(line, block=None):
-    """Format the output string (ie a block) to be parsed by lemonbar.
-    """
+    opts = getopt()
+    if opts.blocks:
+        for name in opts.blocks:
+            try:
+                blocks[name] = config["blocks"][name]
+            except KeyError:
+                print("Block not found: {}".format(name))
+    else:
+        blocks = config["blocks"]
 
-    pfx = []
-    sfx = []
-    pad = " "
+    for name, block in blocks.items():
+        if "static" in block:
+            BLOCKS[name] = block["static"]
+        else:
+            # displayed as long as the module has not produced any output
+            BLOCKS[name] = name  # LOADING...
 
-    if block:
-        if 'actions' in block:
-            actions = block['actions']
-
-            for action in actions:
-                if not isinstance(action, Action):
-                    action = Action(action, actions[action])
-                if action.button < 1 or action.button > 7:
-                    sys.stderr.write(
-                        "Invalid button assignment for action: {0}"
-                        .format(actions[action]))
-
-                pfx.append("%{{A{0}:{1}:}}".format(
-                    action.button, action.command))
-                sfx.append("%{A}")
-
-        if 'colors' in block:
-            c = config.config['colors']['terminal']
-            if 'fg' in block['colors']:
-                color = c[block['colors']['fg']]
-                pfx.append("%{{F{0}}}".format(color))
-                sfx.append("%{F-}")
-
-            if 'bg' in block['colors']:
-                color = c[block['colors']['bg']]
-                pfx.append("%{{B{0}}}".format(color))
-                sfx.append("%{B-}")
-
-        if 'static' in block:
-            pad = ""
-        elif 'pad' in block:
-            pad = block['pad']
-
-    arr = pfx + [pad, line, pad] + sfx
-    line = "".join(list(filter(None, arr)))
-    return line
+    return blocks
