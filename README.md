@@ -1,4 +1,8 @@
+# bar
+
 > My lemonbar helper :)
+
+### Some notes
 
 A block must have a key of `[func, cmd, static]`, where the value of `func`
 must match the base filename of a python script in `modules/`. If the module
