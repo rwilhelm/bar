@@ -1,102 +1,44 @@
-#!/usr/bin/env python3.7
-# pylint: disable=F0401
-
 import asyncio
-import logging
-from asyncio import create_subprocess_shell as shell
-from asyncio.subprocess import PIPE
+import sys
 
-import shared.blocks
-from shared.blocks import clean
-from shared.log import log_stream
+from shared.args import getopt
+from shared.helpers import clean
 
-FOUT = {}
+class Proc:
+    def __init__(self, cmd: str = "lemonbar"):
+        super(Proc, self).__init__()
+        self.args = []
+        self.cmd = cmd
+        self.proc = None
 
-log = logging.getLogger('bar')
+    async def init(self):
+        self.proc = await asyncio.create_subprocess_exec(
+            self.cmd,
+            *map(str, self.args),
+            stdin=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
 
+    async def write(self, string: str):
+        try:
+            self.proc.stdin.write(bytes(string, "utf-8"))
+            await self.proc.stdin.drain()
+        except AttributeError as e:
+            raise e
+        except ConnectionResetError as e:
+            print("Connection reset", file=sys.stderr)
+            sys.exit(0) # exit old process
+            #pass
+            #raise e
 
-def output(name, block, line=None):
-    """Cleanup, format, store and output."""
+    async def consume(self, generator: asyncio.streams.StreamReader):
+        async for bstring in generator:
+            try:
+                self.proc.stdin.write(bstring)
+                await self.proc.stdin.drain()
+            except AttributeError as e:
+                raise e
 
-    # Get custom format function or default
-    fmt = getfmt(name, block)
-
-    # Update
-    if 'static' in block:
-        line = block['static']
-    else:
-        line = clean(line)
-
-    line = fmt(line, block)
-
-    if FOUT[name] == line:
-        return
-    else:
-        FOUT[name] = line
-
-    # Output
-    out = "".join(FOUT.values())
-    print(out, flush=True)
-
-
-async def watch(name, block, stream):
-    """Read and deduplicate."""
-
-    last = None
-    async for line in stream:
-
-        line = clean(line)
-
-        if last == line:
-            continue
-        elif last is None:
-            last = line
-            logging.info("new %s", line)
-            output(name, block, line)
-        else:
-            logging.info("chg %s", line)
-            output(name, block, line)
-            last = line
-
-
-def getfmt(name, block):
-    """Dynamically load a function to format the block."""
-
-    if 'fmt' in block.keys():
-        func_name = block['fmt']
-        return getattr(__import__("modules." + name,
-                                  fromlist=[func_name]), func_name)
-
-    return shared.blocks.fmt
-
-
-async def run(name, block):
-    """Handles three types of blocks: (1) static blocks which do not change,
-    (2) blocks that get their input from a subprocess and (3) blocks that are
-    fed by a generator_function that yields strings."""
-
-    # Static blocks
-    if 'static' in block.keys():
-        output(name, block)
-
-    # Subprocess blocks
-    elif 'cmd' in block.keys():
-        proc = await shell(block['cmd'], stdout=PIPE, stderr=PIPE)
-        await asyncio.gather(watch(name, block, proc.stdout), log_stream(proc.stderr))
-
-    # Generator blocks
-    elif 'func' in block.keys():
-        func = block['func']
-        func = getattr(__import__("modules." + func, fromlist=[func]), func)
-        await watch(name, block, func())
-
-
-def init(blocks):
-    """By creating the keys in FOUT the order of our blocks is preserved like
-    they are configured in config.yml."""
-
-    for block in blocks:
-        if 'static' in block:
-            FOUT[block] = block['static']
-        else:
-            FOUT[block] = block  # LOADING...
+            if getopt("print_actions"):
+                print(clean(bstring))

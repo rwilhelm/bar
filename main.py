@@ -3,39 +3,46 @@
 import asyncio
 import signal
 import sys
+import tracemalloc
+import os
 
-import shared.config as config
-from shared.proc import init, run
+from shared.above import above
+from shared.args import getopt
+from shared.blocks import init
 from shared.lemonbar import lemonbar
-
+from shared.run import run
+from shared.shell import shell
 
 # pylint: disable=unused-argument
 def signal_handler(signum, frame):
     sys.exit(signum)
 
-
 async def main():
+    blocks = init()
+    procs = list(map(lambda x: run(x, blocks[x]), blocks))
 
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete(tcp_echo_client(message, loop))
-    # loop.close()
+    if getopt("lemonbar"):
+        await lemonbar.init()
+        await shell.init()
+        procs.append(shell.consume(lemonbar.proc.stdout))
+        await asyncio.sleep(.02)
+        above()
 
-    # blocks are configured in config.yaml
-    print(config)
-    blocks = config.config['blocks']
-
-    if not blocks:
-        print("No blocks configured")
-        sys.exit(1)
-
-    # creates keys in output dictionary to have them properly ordered (creation
-    # order seems to be maintained in dicts)
-    init(blocks)
-
-    # pass all configured blocks async to the run method
-    await asyncio.gather(*map(lambda x: run(x, blocks[x]), blocks))
+    await asyncio.gather(*procs)
 
 
 if __name__ == "__main__":
+    print("A {}".format(__name__), file=sys.stderr)
+
+    #tracemalloc.start()
+
+    if getopt("daemon"):
+        fpid = os.fork() # fork to 0
+        if fpid != 0:
+            sys.exit(0) # exit old process
+
     signal.signal(signal.SIGINT, signal_handler)
-    asyncio.run(main())
+    asyncio.run(main()) # loops forever
+
+else:
+    print("B {}".format(__name__), file=sys.stderr)
