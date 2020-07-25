@@ -1,50 +1,63 @@
-#!/usr/bin/env python
-
-import sys
-from typing import NamedTuple
-
-from shared.fmt import strfmt
+from shared.args import getopt
 from shared.config import config
 
-
-class Action(NamedTuple):
-    button: int = 1
-    command: str = ""
+BLOCKS = {}
 
 
-def fmt(string, block):
-    """Format click actions for lemonbar
-    """
+def stage(name: str, line: str) -> str:
+    def build() -> str:
+        last = None
+        stage_out = []
+        for name, block in BLOCKS.items():
+            cur = config["blocks"][name]
+            if (
+                name == "left"
+                or name == "leftc"
+                or name == "right"
+                or last
+                and "static" in last.keys()
+            ):
+                stage_out.append(block)
+            else:
+                stage_out.append(" ")
+                stage_out.append(block)
 
-    string = strfmt(string)
+            last = cur
 
-    pfx = []
-    sfx = []
+        stage_out = "".join(stage_out)
+        return stage_out
 
-    if 'actions' in block:
-        actions = block['actions']
+    if not BLOCKS[name] == line:
+        BLOCKS[name] = line
 
-        for action in actions:
-            if not isinstance(action, Action):
-                action = Action(action, actions[action])
-            if action.button < 1 or action.button > 7:
-                sys.stderr.write(
-                    "Invalid button assignment for action: {0}"
-                    .format(actions[action]))
+    return build()
 
-            pfx.append("%{{A{0}:{1}:}}".format(action.button, action.command))
-            sfx.append("%{A}")
 
-    if 'colors' in block:
-        c = config()['colors']['terminal']
-        if 'fg' in block['colors']:
-            color = c[block['colors']['fg']]
-            pfx.append("%{{F{0}}}".format(color))
-            sfx.append("%{F-}")
+def init():
+    """Initialize the global BLOCKS dict by creating the dict and the
+     keys according to the blocks configured. The values of static
+     blocks are immediately stored. For non-static blocks the block
+     name will be stored, which acts as a placeholder until the
+     value of the block is updated. By creating the keys the order
+     of the blocks is preserved in the order they are configured."""
 
-        if 'bg' in block['colors']:
-            color = c[block['colors']['bg']]
-            pfx.append("%{{B{0}}}".format(color))
-            sfx.append("%{B-}")
+    blocks = {}
 
-    return "".join(pfx + [" ", string, " "] + sfx)
+    opts = getopt()
+    if opts.blocks:
+        for name in opts.blocks:
+            try:
+                blocks[name] = config["blocks"][name]
+            except KeyError:
+                print("Block not found: {}".format(name))
+    else:
+        blocks = config["blocks"]
+
+    for name, block in blocks.items():
+        if "static" in block:
+            BLOCKS[name] = block["static"]
+        else:
+            # displayed as long as the module has not produced any output
+            BLOCKS[name] = name  # LOADING...
+
+    return blocks

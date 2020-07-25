@@ -1,30 +1,129 @@
+# vi:set sw=2
+
 ---
 
-bar:
+wrapper:
+  default_theme: base16
+  start_lemonbar: True
+  stdout: False
+  shell: zsh
+
+lemonbar:
   height: 35
   hover: True
-  name: bar
+  name: lemonbar
+  bottom: True
   offset: -4
   regions: 30
+  colors:
+    fg: base16.base07
+    bg: base16.base00
+  fonts:
+    font1: "Envy Code R:pixelsize=18:style=Regular:antialias=true:autohint=true"
+    font2: "Wuncon Siji:pixelsize=18:style=Regular:antialias=true:autohint=true"
 
-
-
+# ------------------------------------------------------------------------------
+  
 blocks:
-
   left:
     static: "%{l}"
 
+  # empty:
+  #     func: empty
+
+  leftc:
+    static: " "
+    actions:
+      1: bspc desktop -f last.occupied
+      3: bspc desktop -f next.!occupied
+      4: bspc desktop -f next.occupied
+      5: bspc desktop -f prev.occupied
+    colors:
+      bg: blue
+    pad: ""
+
   bspwm:
     cmd: bspc subscribe report
-    fmt: bspwm
+    fmt: bspwm_fmt
+    settings:
+      show_monitor: False
+      show_desktop_layout: True
+      show_node_state: True
+      show_node_flags: True
 
   xtitle:
     cmd: xtitle -s
     colors:
-      fg: cyan
+      fg: white
+    actions:
+      1: bspc node -f prev.local
+      3: bspc node -f next.local
+
+  # crash:
+  #   func: crash
+  #   disabled: True
 
   right:
     static: "%{r}"
+
+  # fifo:
+  #   func: fifo
+  #   colors:
+  #     fg: bwhite
+  #     bg: cyan
+  
+  # daemons:
+  #   func: daemons
+
+    #meta:
+    #  func: meta
+    
+  bitcoin:
+    func: bitcoin
+
+  weather:
+    func: openweathermap
+    settings:
+      openweathermap_api_key: f62c513cc8061791d311920bbe712af9
+      latitude: 50.778494
+      longitude: 7.9506802
+      city_id: 2906143
+
+  mpd:
+    func: mpd
+    actions:
+      1: mpc toggle --quiet
+      2: mpc next --quiet
+      3: gmpc& # st ncmpcpp&
+      4: mpc single --quiet
+      5: togglelove
+    colors:
+      fg: yellow
+    settings:
+      host: localhost
+      port: 6600
+      password: blub
+
+  pulseaudio:
+    func: pulseaudio
+
+  sensors:
+    func: sensors
+
+  gpu:
+    func: gpu
+
+  cpu:
+    func: cpu
+
+  mem:
+    func: mem
+
+  load:
+    func: load
+
+  traffic:
+    func: traffic
 
   clock:
     func: clock
@@ -33,26 +132,30 @@ blocks:
     colors:
       fg: bwhite
     settings:
-      clockfmt: "%Y-%m-%d-%H:%M:%S"
+      format: "%a %b %d %H:%M:%S"
 
-fonts:
-
-  font1: "Envy Code R:pixelsize=22:style=Regular:antialias=true:autohint=true"
-  font2: "Wuncon Siji:pixelsize=22:style=Regular:antialias=true:autohint=true"
+  rightc:
+    static: " "
+    actions:
+      1: nautilus.sh new&
+      2: st ranger&
+      3: nautilus.sh toggle&
+    colors:
+      fg: yellow
+      bg: blue
 
 colors:
-
   base16:
-    base00: "#16130f"  # -----
-    base01: "#2c2620"  # ----
-    base02: "#433b32"  # ---
-    base03: "#5a5047"  # --
-    base04: "#8a8075"  # -
-    base05: "#a39a90"  # +
-    base06: "#beb6ae"  # ++
-    base07: "#dbd6d1"  # +++
-    base08: "#826d57"  # ++++
-    base09: "#828257"  # +++++
+    base00: "#16130f" # -----
+    base01: "#2c2620" # ----
+    base02: "#433b32" # ---
+    base03: "#5a5047" # --
+    base04: "#8a8075" # -
+    base05: "#a39a90" # +
+    base06: "#beb6ae" # ++
+    base07: "#dbd6d1" # +++
+    base08: "#826d57" # ++++
+    base09: "#828257" # +++++
     base0A: "#6d8257"
     base0B: "#57826d"
     base0C: "#576d82"
@@ -61,21 +164,21 @@ colors:
     base0F: "#825757"
 
   terminal:
-    black: "#16130f"     # base00, gray50
-    red: "#cc475e"       # 350|65|80 red
-    green: "#5ecc47"     # 110|65|80 green
-    yellow: "#ccb647"    #  50|65|80 yellow
-    blue: "#475ecc"      # 230|65|80 blue
-    magenta: "#7447cc"   # 290|65|80 magenta
-    cyan: "#47a0cc"      # 170|65|80 cyan
-    white: "#beb6ae"     # base06, gray90
-    grey: "#8C8A81"      # base01 black, bright
-    bred: "#ff5975"      # 350|65|80 red
-    bgreen: "#75ff59"    # 110|65|80 green
-    byellow: "#ffe359"   #  50|65|80 yellow
-    bblue: "#5975ff"     # 230|65|80 blue
-    bmagenta: "#e359ff"  # 290|65|80 magenta
-    bcyan: "#59c8ff"     # 170|65|80 cyan, light blue
-    bwhite: "#f1f0ee"    # base07 white
+    black   : "#16130f" # base00, gray50
+    red     : "#cc475e" # 350|65|80 red
+    green   : "#5ecc47" # 110|65|80 green
+    yellow  : "#ccb647" # 50|65|80 yellow
+    blue    : "#475ecc" # 230|65|80 blue
+    magenta : "#7447cc" # 290|65|80 magenta
+    cyan    : "#47a0cc" # 170|65|80 cyan
+    white   : "#beb6ae" # base06, gray90
+    grey    : "#8C8A81" # base01 black, bright
+    bred    : "#ff5975" # 350|65|80 red
+    bgreen  : "#75ff59" # 110|65|80 green
+    byellow : "#ffe359" # 50|65|80 yellow
+    bblue   : "#5975ff" # 230|65|80 blue
+    bmagenta: "#e359ff" # 290|65|80 magenta
+    bcyan   : "#59c8ff" # 170|65|80 cyan, light blue
+    bwhite  : "#f1f0ee" # base07 white
 
 ...

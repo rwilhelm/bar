@@ -1,2 +1,7 @@
+[MASTER]
 disable=
-    missing-docstring
+    missing-docstring,
+    import-error,
+    invalid-name,
+    no-name-in-module
+    protected-access
