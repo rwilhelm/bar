@@ -1,66 +1,44 @@
-#!/usr/bin/env python3.7
-# pylint: disable=F0401
-
 import asyncio
-from asyncio import create_subprocess_shell as shell
-from asyncio.subprocess import PIPE
+import sys
 
-from shared.fmt import strfmt
-from shared.log import log
+from shared.args import getopt
+from shared.helpers import clean
 
-FOUT = {}
+class Proc:
+    def __init__(self, cmd: str = "lemonbar"):
+        super(Proc, self).__init__()
+        self.args = []
+        self.cmd = cmd
+        self.proc = None
 
+    async def init(self):
+        self.proc = await asyncio.create_subprocess_exec(
+            self.cmd,
+            *map(str, self.args),
+            stdin=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
 
-def output(name, line, fmt=None):
-    """Cleanup, format, store and output."""
-    line = strfmt(line)
+    async def write(self, string: str):
+        try:
+            self.proc.stdin.write(bytes(string, "utf-8"))
+            await self.proc.stdin.drain()
+        except AttributeError as e:
+            raise e
+        except ConnectionResetError as e:
+            print("Connection reset", file=sys.stderr)
+            sys.exit(0) # exit old process
+            #pass
+            #raise e
 
-    if fmt:
-        line = fmt(line)
+    async def consume(self, generator: asyncio.streams.StreamReader):
+        async for bstring in generator:
+            try:
+                self.proc.stdin.write(bstring)
+                await self.proc.stdin.drain()
+            except AttributeError as e:
+                raise e
 
-    FOUT[name] = line
-    print("".join(FOUT.values()), flush=True)
-
-
-async def watch(name, stream, fmt=None):
-    """Read and deduplicate."""
-    last = None
-    async for line in stream:
-        if last == line:
-            continue
-        elif last is None:
-            last = line
-            output(name, line, fmt)
-        else:
-            output(name, line, fmt)
-            last = line
-
-
-async def run(name, block):
-    if 'static' in block.keys():
-        FOUT[name] = block['static']
-        return
-
-    if 'fmt' in block.keys():
-        fmt = block['fmt']
-        fmt = getattr(__import__("modules." + fmt,
-                                 fromlist=[fmt + "_fmt"]), fmt + "_fmt")
-    else:
-        fmt = None
-
-    if 'cmd' in block.keys():
-        proc = await shell(block['cmd'], stdout=PIPE, stderr=PIPE)
-        await asyncio.gather(watch(name, proc.stdout, fmt), log(proc.stderr))
-
-    elif 'func' in block.keys():
-        func = block['func']
-        func = getattr(__import__("modules." + func, fromlist=[func]), func)
-        await watch(name, func(block), fmt)
-
-
-def init(blocks):
-    for block in blocks:
-        if 'static' in block:
-            FOUT[block] = block['static']
-        else:
-            FOUT[block] = block  # LOADING...
+            if getopt("print_actions"):
+                print(clean(bstring))

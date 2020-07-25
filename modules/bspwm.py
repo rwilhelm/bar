@@ -2,24 +2,23 @@
 
 from re import match
 
-from shared.blocks import Action, fmt
-from shared.config import config
+from shared.fmt import Action, fmt
+from shared.log import debug
 
 
-# with Popen(["bspc", "subscribe", "report"], stdout=PIPE, bufsize=1,
-#             universal_newlines=True) as p:
+# pylint: disable=too-many-branches
+def bspwm_fmt(line, **block):
 
-
-def bspwm_fmt(line):
     out = []
 
-    c = config()['colors']['terminal']
-
-    if not line[0] == "W":
-        return
+    if not line[0] == 'W':
+        raise ValueError("bspc report prefix unknown")
 
     line = line.rstrip()[1:]
-    items = line.split(":")
+    items = line.split(':')
+
+    if not line:
+        return fmt("")
 
     for item in items:
 
@@ -31,7 +30,7 @@ def bspwm_fmt(line):
         if not v:
             continue
 
-        if match("[fFoOuU]", t):
+        if match('[fFoOuU]', t):
             actions = [
                 Action(1, "bspc desktop -f {0}".format(v)),
                 Action(3, "bspc node -d {0}".format(v)),
@@ -39,48 +38,82 @@ def bspwm_fmt(line):
                 Action(5, "bspc desktop -f prev"),
             ]
 
+            # pad desktop clickables to make them more easily clickable
+            pad = ' '
+
         # - - - - - - - - - -
 
-        # if t == "m":
-        #    # unfocused monitor
-        #    out.append(fmt(v))
-        # elif t == "M":
-        #    # focused monitor
-        #    out.append(fmt(v))
+        if block['settings']['show_monitor']:
+            if t == 'm':
+                # unfocused monitor
+                out.append(fmt(v))
+            elif t == 'M':
+                # focused monitor
+                out.append(fmt(v))
 
-        if t == "f":
+        if t == 'f':
             # free unfocused desktop
-            out.append(fmt(v, {'actions':actions}))
-        elif t == "F":
+            out.append(fmt(v, pad=pad, actions=actions, colors={'fg': 'grey'}))
+        elif t == 'F':
             # free focused desktop
-            out.append(fmt(v, {'actions': actions, 'colors': {'fg': 'red'}}))
-        elif t == "o":
+            out.append(fmt(v, pad=pad, actions=actions, colors={'fg': 'bwhite'}))
+        elif t == 'o':
             # occupied unfocused desktop
-            out.append(fmt(v, {'actions': actions, 'colors': {'fg': 'blue'}}))
-        elif t == "O":
+            out.append(fmt(v, pad=pad, actions=actions, colors={'fg': 'magenta'}))
+        elif t == 'O':
             # occupied focused desktop
-            out.append(fmt(v, {'actions': actions, 'colors': {'fg': 'red'}}))
-        elif t == "u":
+            out.append(fmt(v, pad=pad, actions=actions, colors={
+                'fg': 'bred',
+                #'bg': 'blue',
+                'rev': False
+            }))
+        elif t == 'u':
             # urgent unfocused desktop
-            out.append(fmt(v, {'actions': actions, 'colors': {'fg': 'red'}}))
-        elif t == "U":
+            out.append(fmt(v, pad=pad, actions=actions, colors={'fg': 'red'}))
+        elif t == 'U':
             # urgent focused desktop
-            out.append(fmt(v, {'actions': actions, 'colors': {'fg': 'red'}}))
+            out.append(fmt(v, pad=pad, actions=actions, colors={'fg': 'red'}))
 
-        # if t == "L":
-        #    # focused desktop layout
-        #    out.append(fmt(v, actions=[
-        #        Action(1, "bspc desktop -l next")
-        #    ]))
 
-        # if t == "T":
-        #    # focused node state
-        #    out.append(block(v))
+        if match('[LTG]', t):
+            colors = {
+                'fg': 'grey'
+            }
 
-        # if t == "G":
-        #    # focused node flags
-        #    out.append(block(v))
+        if block['settings']['show_desktop_layout']:
+            if t == 'L':
+                # pad between desktops and stuff
+                #out.append(' ')
+                # desktop layout
+                out.append(fmt(v, colors={
+                    'bg': 'blue',
+                    'fg': 'yellow'
+                }, actions=[
+                    Action(1, 'bspc desktop -l next')
+                ]))
+
+        if block['settings']['show_node_state']:
+            if t == 'T':
+                # node state
+                out.append(fmt(v, colors={
+                    'bg': 'blue',
+                    'fg': 'yellow'
+                }))
+
+        if block['settings']['show_node_flags']:
+            if t == 'G':
+                # node flags
+                out.append(fmt(v, colors={
+                    'bg': 'blue',
+                    'fg': 'yellow'
+                }))
 
         # - - - - - - - - - -
 
-    return "".join(out)
+    #debug(" ".join(out))
+    return fmt("".join(out))
+
+if __name__ == "__main__":
+    print("A", __name__)
+else:
+    print("B", __name__)
