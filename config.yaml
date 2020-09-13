@@ -52,12 +52,14 @@ blocks:
       show_node_flags: True
 
   xtitle:
-    cmd: xtitle -s
+    cmd: xtitle -s -f '%s                                                                                          x\n'
     colors:
       fg: white
     actions:
-      1: bspc node -f prev.local
-      3: bspc node -f next.local
+      1: bspc node -f next.local.!hidden.window
+      3: bspc node -f prev.local.!hidden.window
+      5: bspc node @/ --circulate backward
+      4: bspc node @/ --circulate forward
 
   # crash:
   #   func: crash
