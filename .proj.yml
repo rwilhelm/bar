@@ -1,0 +1,8 @@
+---
+- name: bar
+  lang: python
+  tags: [ bar, wrapper, lemonbar ]
+  date: 2019-09-12 05:01:03
+  init: 35d35554f1cae32e6e91473be3388436eebc7d86
+  repo: https://git.sr.ht/~rxw/bar
+  description: Lemonbar wrapper
