@@ -21,7 +21,7 @@ async def sensors():
         with open('/sys/class/hwmon/hwmon0/temp1_input', 'r', encoding="utf-8") as p:
             t[0] = float(p.read())/1000 # mainboard temperature?
 
-        with open('/sys/class/hwmon/hwmon1/temp1_input', 'r', encoding="utf-8") as p:
+        with open('/sys/class/hwmon/hwmon0/temp2_input', 'r', encoding="utf-8") as p:
             t[1] = float(p.read())/1000 # overall cpu temperature?
 
         yield fmt("{} {}".format(fmt(t[0], colors=colorize(t[0])), fmt(t[1], colors=colorize(t[1]))))
