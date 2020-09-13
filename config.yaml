@@ -21,9 +21,10 @@ lemonbar:
   fonts:
     font1: "Envy Code R:pixelsize=18:style=Regular:antialias=true:autohint=true"
     font2: "Wuncon Siji:pixelsize=18:style=Regular:antialias=true:autohint=true"
+    font3: "Font Awesome 5 Free Solid:pixelsize=18:style=Regular:antialias=true:autohint=true"
 
 # ------------------------------------------------------------------------------
-  
+
 blocks:
   left:
     static: "%{l}"
@@ -73,13 +74,13 @@ blocks:
   #   colors:
   #     fg: bwhite
   #     bg: cyan
-  
+
   # daemons:
   #   func: daemons
 
     #meta:
     #  func: meta
-    
+
   bitcoin:
     func: bitcoin
 
@@ -112,8 +113,8 @@ blocks:
   sensors:
     func: sensors
 
-  gpu:
-    func: gpu
+    #  gpu:
+    #    func: gpu
 
   cpu:
     func: cpu
